@@ -26,10 +26,7 @@ public class Principal {
     }
 
     public static void main(String args[]) {
-        HistogramBlue hb = new HistogramBlue(getImage());
+        Corrector corrector = new Corrector(getImage());
 
-        for (int i = 0; i< hb.stats.size(); ++i) {
-            System.out.println(hb.stats.get(i));
-        }
     }
 }

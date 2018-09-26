@@ -1,47 +1,40 @@
-import java.awt.image.BufferedImage;
-import java.awt.image.DataBufferByte;
 import java.util.ArrayList;
 
-abstract public class Histogram {
+public class Histogram {
 
     class Zone {
-        int begin;
-        int end;
+         int begin;
+         int end;
     }
 
-    private ArrayList<Zone> zoneList = new ArrayList<>();
-    protected ArrayList<Integer> stats = new ArrayList<>();
-    protected byte[] pixels;
+    private ArrayList<Zone> zonelist = new ArrayList<>();
 
-    public void setStats(ArrayList<Integer> stats) {
-        this.stats = stats;
+    public ArrayList<Zone> getZonelist() {
+        return zonelist;
     }
 
-    public ArrayList<Integer> getStats() {
-        return stats;
+    public void setZonelist(ArrayList<Zone> zones) {
+        zonelist = zones;
     }
 
-    public void setPixels(byte[] pixels) {
-        this.pixels = pixels;
+    Histogram(ArrayList<Integer> colors) {
+        setZonelist(findZones(colors));
     }
 
-    public byte[] getPixels() {
-        return pixels;
-    }
+    public ArrayList<Zone> findZones(ArrayList<Integer> colors) {
+        ArrayList<Zone> zones = new ArrayList<>();
+        Zone temp = new Zone();
 
-    public byte[] readImage(BufferedImage image) {
-        return ((DataBufferByte) image.getRaster().getDataBuffer()).getData();
-    }
-
-    public void createTable() {
-        for(int i = 0; i < 255; ++i)
-            stats.add(0);
-    }
-
-    abstract protected void getComponent();
-
-    public void findZones() {
-
+        for(int i = 0; i < 256; ++i) {
+            if(!colors.get(i).equals(0)) {
+                temp.begin = i;
+                while (!colors.get(i).equals(0))
+                    ++i;
+                temp.end = i - 1;
+            }
+            zones.add(temp);
+        }
+        return zones;
     }
 
 }
