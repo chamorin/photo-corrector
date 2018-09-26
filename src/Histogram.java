@@ -3,8 +3,13 @@ import java.util.ArrayList;
 public class Histogram {
 
     class Zone {
-         int begin;
-         int end;
+        int begin;
+        int end;
+
+        Zone(int b, int e) {
+            begin = b;
+            end = e;
+        }
     }
 
     private ArrayList<Zone> zonelist = new ArrayList<>();
@@ -23,16 +28,17 @@ public class Histogram {
 
     public ArrayList<Zone> findZones(ArrayList<Integer> colors) {
         ArrayList<Zone> zones = new ArrayList<>();
-        Zone temp = new Zone();
-
-        for(int i = 0; i < 256; ++i) {
-            if(!colors.get(i).equals(0)) {
-                temp.begin = i;
+        int i = 0, begin = 0, end = 0;
+        while (i < 256) {
+            if (!colors.get(i).equals(0)) {
+                begin = i;
                 while (!colors.get(i).equals(0))
                     ++i;
-                temp.end = i - 1;
+                end = i;
+                zones.add(new Zone(begin, end));
             }
-            zones.add(temp);
+            ++i;
+            // System.out.println(i);
         }
         return zones;
     }

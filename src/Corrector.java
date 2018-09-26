@@ -17,11 +17,12 @@ public class Corrector {
         Histogram histogramRed = new Histogram(redList);
         Histogram histogramGreen = new Histogram(greenList);
         Histogram histogramBlue = new Histogram(blueList);
+        
     }
 
     private void createList(ArrayList<Integer> list) {
         for (int i = 0; i <= 256; ++i)
-            list.add(i,0);
+            list.add(i, 0);
     }
 
     public void getComponents(BufferedImage image) {
