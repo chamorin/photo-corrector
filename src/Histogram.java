@@ -12,18 +12,18 @@ public class Histogram {
         }
     }
 
-    private ArrayList<Zone> zonelist = new ArrayList<>();
+    private ArrayList<Zone> zones = new ArrayList<>();
 
-    public ArrayList<Zone> getZonelist() {
-        return zonelist;
+    public ArrayList<Zone> getZones() {
+        return zones;
     }
 
-    public void setZonelist(ArrayList<Zone> zones) {
-        zonelist = zones;
+    public void setZones(ArrayList<Zone> zoneList) {
+        this.zones = zoneList;
     }
 
     Histogram(ArrayList<Integer> colors) {
-        setZonelist(findZones(colors));
+        setZones(findZones(colors));
     }
 
     public ArrayList<Zone> findZones(ArrayList<Integer> colors) {
@@ -38,7 +38,6 @@ public class Histogram {
                 zones.add(new Zone(begin, end));
             }
             ++i;
-            // System.out.println(i);
         }
         return zones;
     }

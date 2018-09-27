@@ -68,3 +68,13 @@ fabric.properties
 *.jpg
 
 *.jpeg
+
+cls
+
+cls_test10
+
+*.png
+
+test\.jpg_cls
+
+src/tests
