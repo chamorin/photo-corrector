@@ -29,11 +29,11 @@ public class Corrector {
         Histogram histogramBlue = new Histogram(blueList);
 
         createImageCls(image, histogramRed, histogramGreen, histogramBlue);
+        createImageClc(image, histogramRed, histogramGreen, histogramBlue);
     }
 
     private BufferedImage getImage() {
         BufferedImage image = null;
-        String fileName = "";
         try {
             System.out.print("Enter image name: ");
             Scanner sc = new Scanner(System.in);
@@ -55,18 +55,13 @@ public class Corrector {
     public void getComponents(BufferedImage image) {
         int width = image.getWidth();
         int height = image.getHeight();
-        int rgb, red, green, blue;
+        int red, green, blue;
         for (int col = 0; col < width; ++col) {
             for (int row = 0; row < height; ++row) {
                 Couleur color = new Couleur(image.getRGB(col, row));
                 red = color.getRouge();
                 green = color.getVert();
                 blue = color.getBleu();
-
-//                rgb = image.getRGB(col, row);
-//                red = (rgb >> 16) & 0xff;
-//                green = (rgb >> 8) & 0xff;
-//                blue = (rgb >> 0) & 0xff;
 
                 redList.set(red, redList.get(red) + 1);
                 greenList.set(green, greenList.get(green) + 1);
@@ -78,7 +73,10 @@ public class Corrector {
     public void createImageCls(BufferedImage image, Histogram histogramRed, Histogram histogramGreen, Histogram histogramBlue) {
         int width = image.getWidth();
         int height = image.getHeight();
-        int rgb, red, green, blue;
+
+        BufferedImage newImage = new BufferedImage(width, height, image.getType());
+
+        int red, green, blue;
         for (int col = 0; col < width; ++col) {
             for (int row = 0; row < height; ++row) {
                 Couleur color = new Couleur(image.getRGB(col, row));
@@ -86,70 +84,87 @@ public class Corrector {
                 green = color.getVert();
                 blue = color.getBleu();
 
-//                rgb = image.getRGB(col, row);
-//                red = (rgb >> 16) & 0xff;
-//                green = (rgb >> 8) & 0xff;
-//                blue = (rgb >> 0) & 0xff;
-
                 color.setRouge(firstAlgo(red, histogramRed));
                 color.setVert(firstAlgo(green, histogramGreen));
                 color.setBleu(firstAlgo(blue, histogramBlue));
 
-                image.setRGB(col, row, color.getArgb());
+                newImage.setRGB(col, row, color.getArgb());
             }
         }
         try {
-            ImageIO.write(image, "jpg", new File("cls_" + imageName));
+            ImageIO.write(newImage, "jpg", new File(imageName + "cls.jpg"));
         } catch (IOException e) {
-            // Erreur
+            System.err.println("Error: unable to create cls image");
+            System.exit(-1);
         }
     }
 
     public void createImageClc(BufferedImage image, Histogram histogramRed, Histogram histogramGreen, Histogram histogramBlue) {
         int width = image.getWidth();
         int height = image.getHeight();
-        int rgb, red, green, blue;
+
+        BufferedImage newImage = new BufferedImage(width, height, image.getType());
+
+        int red, green, blue;
         for (int col = 0; col < width; ++col) {
             for (int row = 0; row < height; ++row) {
-                rgb = image.getRGB(col, row);
+                Couleur color = new Couleur(image.getRGB(col, row));
+                red = color.getRouge();
+                green = color.getVert();
+                blue = color.getBleu();
 
-                red = (rgb >> 16) & 0xff;
-                green = (rgb >> 8) & 0xff;
-                blue = (rgb >> 0) & 0xff;
+                color.setRouge(secondAlgo(red, histogramRed));
+                color.setVert(secondAlgo(green, histogramGreen));
+                color.setBleu(secondAlgo(blue, histogramBlue));
 
-                image.setRGB(col, row, secondAlgo(red, histogramRed) + secondAlgo(green, histogramGreen) + secondAlgo(blue, histogramBlue));
-
+                newImage.setRGB(col, row, color.getArgb());
             }
         }
         try {
-            ImageIO.write(image, "jpg", new File("clc_" + imageName));
+            ImageIO.write(newImage, "jpg", new File(imageName + "clc.jpg"));
         } catch (IOException e) {
-            // Erreur
+            System.err.println("Error: unable to create clc image");
+            System.exit(-1);
         }
     }
 
     public int firstAlgo(int value, Histogram histogram) {
-
         value = 256 * (value - histogram.getZones().get(0).begin) /
-                histogram.getZones().get(histogram.getZones().size() - 1).end - histogram.getZones().get(0).begin + 1;
+                (histogram.getZones().get(histogram.getZones().size() - 1).end - histogram.getZones().get(0).begin + 1);
         return value;
     }
 
-    public int secondAlgo(int value, Histogram histogram) {
-        ArrayList<Integer> m = new ArrayList<>();
+    public ArrayList<Integer> findCenterValues(Histogram histogram) {
+        ArrayList<Integer> center = new ArrayList<>();
 
-        for (int i = 0; i < histogram.getZones().size(); ++i) {
-            if (i == 0)
-                m.add(i, 0);
-            else if (histogram.getZones().get(i) == histogram.getZones().get(histogram.getZones().size() - 1)) {
-                m.add(i, 255);
-            } else {
-                int temp = (histogram.getZones().get(i - 1).end + histogram.getZones().get(i).begin) / 2;
-                m.add(i, temp);
-            }
+        center.add(0, 0);
+        for (int i = 1; i < histogram.getZones().size(); ++i) {
+            int temp = (histogram.getZones().get(i - 1).end + histogram.getZones().get(i).begin) / 2;
+            center.add(i, temp);
         }
+        center.add(255);
 
+        return center;
+    }
 
-        return 0;
+    public int findBelongingZone(int value, Histogram histogram) {
+        int zone = 0;
+        for (int i = 1; i < histogram.getZones().size(); ++i) {
+            if (histogram.getZones().get(i).begin <= value && value <= histogram.getZones().get(i).end)
+                zone = i;
+//            else
+//                zone = histogram.getZones().size() - 1;
+        }
+        return zone;
+    }
+
+    public int secondAlgo(int value, Histogram histogram) {
+        ArrayList<Integer> center = findCenterValues(histogram);
+        int zone = findBelongingZone(value, histogram);
+
+        value = center.get(zone) + (center.get(zone + 1) - center.get(zone) + 1) * (value - histogram.getZones().get(zone).begin) /
+                (histogram.getZones().get(zone).end - histogram.getZones().get(zone).begin + 1);
+
+        return value;
     }
 }

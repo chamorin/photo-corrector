@@ -28,7 +28,7 @@ public class Histogram {
 
     public ArrayList<Zone> findZones(ArrayList<Integer> colors) {
         ArrayList<Zone> zones = new ArrayList<>();
-        int i = 0, begin = 0, end = 0;
+        int i = 0, begin, end;
         while (i < 256) {
             if (!colors.get(i).equals(0)) {
                 begin = i;
