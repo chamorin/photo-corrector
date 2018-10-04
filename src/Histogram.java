@@ -1,5 +1,9 @@
 import java.util.ArrayList;
 
+/**
+ * - Histogram class -
+ * Contains one of the three color components of the selected image
+ */
 public class Histogram {
 
     class Zone {
@@ -12,34 +16,55 @@ public class Histogram {
         }
     }
 
-    private ArrayList<Zone> zones = new ArrayList<>();
+    private ArrayList<Zone> _zones = new ArrayList<>();
+    public ArrayList<Integer> _componentsList;
 
     public ArrayList<Zone> getZones() {
-        return zones;
+        return _zones;
     }
 
-    public void setZones(ArrayList<Zone> zoneList) {
-        this.zones = zoneList;
+    private void setZones(ArrayList<Zone> zoneList) {
+        this._zones = zoneList;
     }
 
-    Histogram(ArrayList<Integer> colors) {
-        setZones(findZones(colors));
+    Histogram() {
+        _componentsList = createList();
     }
 
-    public ArrayList<Zone> findZones(ArrayList<Integer> colors) {
+    /**
+     * Creates empty Integer list of size 256
+     *
+     * @return the new empty list
+     */
+    private ArrayList<Integer> createList() {
+        ArrayList<Integer> colorList = new ArrayList<>();
+        try {
+            for (int i = 0; i <= 256; ++i)
+                colorList.add(i, 0);
+        } catch (Exception e) {
+            System.err.println("Error: unable to create list");
+            System.exit(-1);
+        }
+        return colorList;
+    }
+
+    /**
+     * Finds every zones where the components value are not zero
+     */
+    public void findZones() {
         ArrayList<Zone> zones = new ArrayList<>();
         int i = 0, begin, end;
         while (i < 256) {
-            if (!colors.get(i).equals(0)) {
+            if (!_componentsList.get(i).equals(0)) {
                 begin = i;
-                while (!colors.get(i).equals(0))
+                while (!_componentsList.get(i).equals(0))
                     ++i;
                 end = i;
                 zones.add(new Zone(begin, end));
             }
             ++i;
         }
-        return zones;
+        setZones(zones);
     }
 
 }
