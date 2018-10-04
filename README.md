@@ -1,4 +1,4 @@
-# photo-corrector
+# photo-corrector :camera:
 Java program that applies two algorithms to an image's RGB components. 
 As a result it creates two images one for each algorithm.
 
